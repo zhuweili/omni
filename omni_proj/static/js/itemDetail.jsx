@@ -1,8 +1,11 @@
-
-
-let socket = new WebSocket("ws://" + "localhost:8000" + "/omni/")
-
+let socket = new WebSocket("ws://" + "localhost:8000" + "/omni/");
 let content = null;
+
+let getUrlList = function(){
+    var whole_url = window.location.href;
+    var compent_list = whole_url.split('/');
+    return compent_list
+};
 
 
 class CommentList extends React.Component{
@@ -12,8 +15,7 @@ class CommentList extends React.Component{
     }
 
     componentWillMount() {
-        var whole_url = window.location.href;
-        var compent_list = whole_url.split('/');
+        var compent_list = getUrlList();
         var id_name = compent_list[4];
         console.log(id_name)
         fetch("http://localhost:8000/api/comment/?q=" + id_name)
@@ -43,11 +45,13 @@ class CommentList extends React.Component{
     }
 
     componentDidMount() {
-        var that = this;
+       var that = this;
        socket.onmessage = function(e) {
+          var compent_list = getUrlList();
+          var id_name = compent_list[4];
           let c = e.data.split("$");
           let cdn = "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI/PjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+PCEtLQpTb3VyY2UgVVJMOiBob2xkZXIuanMvNjR4NjQKQ3JlYXRlZCB3aXRoIEhvbGRlci5qcyAyLjYuMC4KTGVhcm4gbW9yZSBhdCBodHRwOi8vaG9sZGVyanMuY29tCihjKSAyMDEyLTIwMTUgSXZhbiBNYWxvcGluc2t5IC0gaHR0cDovL2ltc2t5LmNvCi0tPjxkZWZzPjxzdHlsZSB0eXBlPSJ0ZXh0L2NzcyI+PCFbQ0RBVEFbI2hvbGRlcl8xNjM3ODY3YmNiNiB0ZXh0IHsgZmlsbDojQUFBQUFBO2ZvbnQtd2VpZ2h0OmJvbGQ7Zm9udC1mYW1pbHk6QXJpYWwsIEhlbHZldGljYSwgT3BlbiBTYW5zLCBzYW5zLXNlcmlmLCBtb25vc3BhY2U7Zm9udC1zaXplOjEwcHQgfSBdXT48L3N0eWxlPjwvZGVmcz48ZyBpZD0iaG9sZGVyXzE2Mzc4NjdiY2I2Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIGZpbGw9IiNFRUVFRUUiLz48Zz48dGV4dCB4PSIxMy40Njg3NSIgeT0iMzYuNSI+NjR4NjQ8L3RleHQ+PC9nPjwvZz48L3N2Zz4="
-           let imageStyle = {width: '64px', height: '64px'};
+          let imageStyle = {width: '64px', height: '64px'};
            var comment = {
                   name: c[0],
                   author: c[1],
@@ -55,9 +59,8 @@ class CommentList extends React.Component{
                   timestamp: c[3],
             };
           console.log(comment);
-
-
-          let comment_list = that.state.comment_list;
+          if (id_name === c[0]){
+              let comment_list = that.state.comment_list;
            comment_list.unshift(
 
                <div className="media">
@@ -69,11 +72,14 @@ class CommentList extends React.Component{
                                 { comment.timestamp }
                               </div>
                         </div>
-           )
+           );
            that.setState({comment_list: comment_list});
            console.log(that.state.comment_list.length);
-          // let json_c = JSON.parse(c);
-          // console.log(json_c)
+          }
+
+
+
+
     }}
 
 
